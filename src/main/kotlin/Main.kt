@@ -1,8 +1,7 @@
 import java.text.NumberFormat
 import java.util.*
 
-//global vaiable
-    val scanner : Scanner = Scanner(System.`in`)
+//global variable
     val gol : Array<Int> = arrayOf(1,2,3)
     val gp : Array<Double> = arrayOf(2_500_000.00,4_500_000.00,6_500_000.00)
     val formatter : NumberFormat = NumberFormat.getInstance(Locale.US)
@@ -24,23 +23,30 @@ fun iptNumber(message : String) : Int {
     println()
     println("|------------Form Input--------------|")
     print("| >> $message : ")
-    return scanner.nextInt()
+    return readln().toInt()
+
 }
 fun iptString(message : String) : String{
     println()
     println("|------------Form Input--------------|")
     print("| >> $message : ")
-    return scanner.nextLine()
+    return readln()
 }
 
 fun testMethod(){
     mainMenu()
     showData()
     val iptNama = iptString("Masukkan Nama").uppercase(Locale.getDefault())
-    val iptJk = iptString("Masukkan Jenis Kelamin (l/p)")
-    val iptKwin = iptString("Masukkan Kawin (y/t)")
+    val iptJk = iptString("Masukkan Jenis Kelamin (l/p)").uppercase(Locale.getDefault())
+    val iptKwin = iptString("Masukkan Kawin (y/t)").uppercase(Locale.getDefault())
     val iptGol = iptNumber(message = "Masukkan Golongan")
     var tjgnIstri = 0.0
+    var tjgnAnak = 0.0
+    var gajiBruto: Double
+    var byJabatan: Double
+    val iuranPensi = 15_000.00
+    val iuranOrganisasi = 3_500.00
+    var gajiNetto : Double
     for (i in gol.indices){
         if (gol[i] == iptGol){
             val golongan = gol[i]
@@ -50,19 +56,21 @@ fun testMethod(){
             println("| >> Data Pegawai : ")
             println("| >> Nama $iptNama")
             when (iptJk){
-                "l" -> println("| >> Jenis Kelamin LAKI-LAKI")
+                "L" -> println("| >> Jenis Kelamin LAKI-LAKI")
                 "P" -> println("| >> jenis kelamin PEREMPUAN")
-                else -> println("Periksa Kembali Inputan Anda ")
+                else -> println(" | >> Periksa Kembali Inputan Anda ")
             }
             when (iptKwin){
-                "y" -> println("| >> Sudah Kawin")
-                "t" -> println("| >> Belum Kawin")
+                "Y" -> println("| >> Sudah Kawin")
+                "T" -> println("| >> Belum Kawin")
                 else -> println("Periksa Kembali Inputan Anda ")
             }
+
             println("| >> Golongan $golongan")
             println("| >> Gaji Pokok Rp.$gajiPokokFormatNumber")
 
-            if (iptJk == "l" && iptKwin == "y"){
+//            hitung tunjangan istri
+            if (iptJk == "L" && iptKwin == "Y"){
                 when (golongan) {
                     1 -> {
                         tjgnIstri = gajiPokok * 0.01
@@ -76,14 +84,41 @@ fun testMethod(){
                     }
                 }
             }
-            println()
-            println("| >> TUNJANGAN : ")
+
+//            tunjangan anak
+            if  (iptKwin == "Y") {
+                val iptPnyaAnak = iptString(message = "Punya Anak? (y/t)").uppercase(Locale.getDefault())
+                if (iptPnyaAnak == "Y"){
+                    tjgnAnak = gajiPokok * 0.02
+                }
+            }
+
+
+//            Gaji Bruto
+            gajiBruto = gajiPokok + tjgnAnak + tjgnIstri
+//          hitung biaya jabatan
+            byJabatan = 0.005 * gajiBruto
+            gajiNetto = gajiBruto - (byJabatan + iuranPensi + iuranOrganisasi)
+
+            println("-------------------------------------------------------")
             println("| >> Tunjangan Istri ${formatter.format(tjgnIstri)}")
+            println("| >> Tunjangan Anak ${formatter.format(tjgnAnak)}")
+            println("| >> Gaji Bruto ${formatter.format(gajiBruto)}")
+            println("-------------------------------------------------------")
+            println("| >> Biaya Jabatan ${formatter.format(byJabatan)}")
+            println("| >> Iuran Pensiun ${formatter.format(iuranPensi)}")
+            println("| >> Iuran Organisasi ${formatter.format(iuranOrganisasi)}")
+            println("| >> Gaji Netto ${formatter.format(gajiNetto)}")
+
+
 
         }
     }
 }
 
 fun main() {
-    testMethod()
+    do {
+        testMethod()
+        val iptUlang = iptString("Ulangi program?").uppercase(Locale.getDefault())
+    }while (iptUlang == "Y")
 }
